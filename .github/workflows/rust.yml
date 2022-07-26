@@ -7,7 +7,7 @@ env:
 
 jobs:
   test:
-    name: Test
+    name: Rust Test
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
