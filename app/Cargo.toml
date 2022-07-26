@@ -10,6 +10,7 @@ edition = "2021"
 anyhow = "1.0.58"
 axum = {version = "0.5.13", default-features = true, features = ["json", "headers"] }
 env_logger = "0.9.0"
+lazy_static = "1.4.0"
 log = "0.4.17"
 serde = {version = "1.0.140", features = ["derive"]}
 tempfile = "3.3.0"

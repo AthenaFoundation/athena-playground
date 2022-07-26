@@ -1,12 +1,9 @@
-use std::{path::{PathBuf, Path}, ffi::OsString};
+use std::path::{Path, PathBuf};
 
-use tokio::process::Command;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use tempfile::{self, TempDir};
+use tokio::process::Command;
 use uuid::Uuid;
-use crate::Config;
-
-
 
 #[derive(Deserialize, Default)]
 pub struct AthenaFileInput {
@@ -15,15 +12,15 @@ pub struct AthenaFileInput {
     pub name: String,
 }
 
-
 pub struct Sandbox {
     file: AthenaFileInput,
+    #[allow(dead_code)]
     container_id: Option<String>,
-    dir: TempDir
+    dir: TempDir,
 }
 
 impl Sandbox {
-
+    #[allow(dead_code)]
     pub fn athfile(&self) -> PathBuf {
         self.dir.path().join(self.file.name())
     }
@@ -37,24 +34,22 @@ impl Sandbox {
     }
 
     pub async fn new(f: AthenaFileInput) -> Self {
-        let temp_dir = tempfile::Builder::new()
-            .prefix("temp-ath")
-            .tempdir();
+        let temp_dir = tempfile::Builder::new().prefix("temp-ath").tempdir();
         match temp_dir {
-            Ok(d) => {
-                Self { file: f, container_id: None, dir: d }
-            }
+            Ok(d) => Self {
+                file: f,
+                container_id: None,
+                dir: d,
+            },
             Err(e) => {
                 println!("ERROR {:?}", e);
                 Self {
                     file: f,
                     container_id: None,
-                    dir: TempDir::new().unwrap()
+                    dir: TempDir::new().unwrap(),
                 }
             }
         }
-       
-
     }
     pub async fn write_ath_module(&self) {
         let src = self.file.src_code();
@@ -64,18 +59,16 @@ impl Sandbox {
             .expect("Error writing athena code to temp file");
     }
 
-
     pub fn generate_run_command(&self) -> Command {
         let mut cmd = Command::new("docker");
-            
-            let mut mount_exec_file = self.athfile_with_ext().into_os_string();
-            mount_exec_file.push(":");
-            mount_exec_file.push("/athena/temp-ath-files/");
-            mount_exec_file.push(self.file.name_with_ext());
-            cmd
-            .arg("run")
+
+        let mut mount_exec_file = self.athfile_with_ext().into_os_string();
+        mount_exec_file.push(":");
+        mount_exec_file.push("/athena/temp-ath-files/");
+        mount_exec_file.push(self.file.name_with_ext());
+        cmd.arg("run")
             .arg("--name")
-            .arg(format!("{}", self.file.name()))
+            .arg(self.file.name())
             .arg("--detach")
             .arg("--workdir")
             .arg("/athena")
@@ -84,15 +77,15 @@ impl Sandbox {
             .arg("--volume")
             .arg(mount_exec_file)
             .arg("athena_runtime");
-            
+
         cmd.kill_on_drop(true);
         cmd
     }
 
     pub fn execute(&self, cmd: &mut Command) {
-            cmd.arg(format!("/athena/temp-ath-files/{}.ath", self.file.name()));
-            // cmd.arg("--env")
-            //     .arg(format!("ATH_FILE_NAME={}", self.name));
+        cmd.arg(format!("/athena/temp-ath-files/{}.ath", self.file.name()));
+        // cmd.arg("--env")
+        //     .arg(format!("ATH_FILE_NAME={}", self.name));
     }
 }
 impl AthenaFileInput {
@@ -114,13 +107,10 @@ impl AthenaFileInput {
     pub fn src_code(&self) -> &str {
         &self.ath
     }
-
 }
 
 #[derive(Serialize)]
 pub struct AthenaExecResult {
     pub err: bool,
-    pub message: String
+    pub message: String,
 }
-
-
