@@ -8,7 +8,7 @@ First, build the server:
 `cd app & cargo build`
 
 Then, the frontend:
-`cd app/frontend & npm run build`
+`cd app/frontend && npm i &&  npm run build`
 
 Then run the server:
 `cargo run`
