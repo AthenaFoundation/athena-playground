@@ -1,0 +1,1 @@
+module MyAthModule \n\n datatype N := zero | (S n)\n"}

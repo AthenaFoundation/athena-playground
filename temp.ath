@@ -1,0 +1,3 @@
+module Temp {
+    (print "temp\n")
+}
