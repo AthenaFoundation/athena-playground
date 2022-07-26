@@ -1,9 +1,18 @@
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::OsString,
+    io::Read,
+    path::{Path, PathBuf},
+    process::Stdio,
+};
 
 use serde::{Deserialize, Serialize};
 use tempfile::{self, TempDir};
+use tokio::io::{self, AsyncReadExt};
 use tokio::process::Command;
+use tokio_stream::StreamExt;
 use uuid::Uuid;
+
+use crate::Config;
 
 #[derive(Deserialize, Default)]
 pub struct AthenaFileInput {
@@ -59,6 +68,13 @@ impl Sandbox {
             .expect("Error writing athena code to temp file");
     }
 
+    pub fn container_id_from_output(&mut self, out: std::process::Output) {
+        let output_str = String::from_utf8_lossy(&out.stdout);
+        let id = output_str.lines().next().unwrap().trim();
+
+        self.container_id = Some(id.to_string());
+    }
+
     pub fn generate_run_command(&self) -> Command {
         let mut cmd = Command::new("docker");
 
@@ -86,6 +102,50 @@ impl Sandbox {
         cmd.arg(format!("/athena/temp-ath-files/{}.ath", self.file.name()));
         // cmd.arg("--env")
         //     .arg(format!("ATH_FILE_NAME={}", self.name));
+    }
+
+    // Primary way to execute a command. This waits for the container to complete and collects its output
+    pub async fn wait_on_cmd(&mut self, mut cmd: Command) -> String {
+        let output = cmd.output().await.expect("Error executing command");
+
+        self.container_id_from_output(output);
+        Command::new("docker")
+            .arg("wait")
+            .arg(self.container_id.as_ref().unwrap())
+            .output()
+            .await
+            .expect("Error waiting on container execution");
+
+        self.get_logs().await
+    }
+
+    pub async fn shutdown(&self) {
+        let mut command = Command::new("docker");
+
+        command
+            .arg("rm")
+            .arg("--force")
+            .arg(self.container_id.as_ref().unwrap())
+            .stdout(std::process::Stdio::null());
+        command
+            .status()
+            .await
+            .expect("Error removing container during shutdown");
+    }
+    pub async fn get_logs(&self) -> String {
+        let mut cmd = std::process::Command::new("docker");
+        cmd.arg("logs").arg(&self.container_id.as_ref().unwrap());
+        let outp = cmd.stdout(Stdio::piped()).output();
+
+        match outp {
+            Ok(o) => {
+                let o = String::from_utf8_lossy(&o.stdout);
+                o.to_string()
+            }
+            Err(e) => {
+                format!("Error in log retrieval: {:#?}", e)
+            }
+        }
     }
 }
 impl AthenaFileInput {

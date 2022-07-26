@@ -1,17 +1,19 @@
-use axum::http::{header, HeaderValue, Method};
-
+use anyhow::{anyhow, Result};
+use axum::http::{header, HeaderValue, Method, Response};
+use axum::response::IntoResponse;
 use axum::routing::{get_service, post, MethodRouter};
-use axum::{response::Html, Json, Router};
-
-use tower_http::cors::{self, CorsLayer};
-
-use std::path::PathBuf;
+use axum::{response::Html, routing::get, Json, Router};
+use serde::{Deserialize, Serialize};
+use std::io::Write;
+use std::net::SocketAddr;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::time::Duration;
-
-use std::process::Stdio;
-
-use tower_http::services::ServeDir;
+use tokio::time::sleep;
+use tower_http::cors::{self, CorsLayer};
+use tower_http::services::{ServeDir, ServeFile};
 use tower_http::set_header::SetResponseHeader;
+use uuid::Uuid;
 
 use crate::athena_sandbox::Sandbox;
 use crate::{
@@ -25,7 +27,7 @@ async fn handler() -> Html<&'static str> {
 
 async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<AthenaExecResult> {
     let ath_file = payload.set_random_name();
-    let sb = Sandbox::new(ath_file).await;
+    let mut sb = Sandbox::new(ath_file).await;
     let sb_file_path = sb.athfile_with_ext();
     println!("SB FILE PATH: {:?}", sb_file_path.as_os_str());
 
@@ -46,22 +48,15 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
     let mut cmd = sb.generate_run_command();
     sb.execute(&mut cmd);
     println!("command: {:#?}", cmd);
-    let output = cmd.stdout(Stdio::piped()).output().await;
 
+    let output = sb.wait_on_cmd(cmd).await;
+    sb.shutdown().await;
     let mut res = AthenaExecResult {
         err: false,
         message: String::new(),
     };
-    match output {
-        Ok(c) => {
-            println!("Executing athena code");
-            let msg = String::from_utf8_lossy(&c.stdout);
-            res.message = msg.to_string();
-        }
-        Err(e) => {
-            res.message = format!("{}", e);
-        }
-    }
+    res.message = output;
+
     Json(res)
 }
 

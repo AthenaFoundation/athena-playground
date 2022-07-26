@@ -106,7 +106,7 @@ export default function Home() {
   }
 
   const runCode = () => {
-
+    setExecResult("Executing in progres...")
     handleCodeRun(code)
   }
 
