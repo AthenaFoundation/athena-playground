@@ -23,11 +23,13 @@ pub struct AthenaFileInput {
 
 pub struct Sandbox {
     file: AthenaFileInput,
+    #[allow(dead_code)]
     container_id: Option<String>,
     dir: TempDir,
 }
 
 impl Sandbox {
+    #[allow(dead_code)]
     pub fn athfile(&self) -> PathBuf {
         self.dir.path().join(self.file.name())
     }
@@ -82,7 +84,7 @@ impl Sandbox {
         mount_exec_file.push(self.file.name_with_ext());
         cmd.arg("run")
             .arg("--name")
-            .arg(format!("{}", self.file.name()))
+            .arg(self.file.name())
             .arg("--detach")
             .arg("--workdir")
             .arg("/athena")

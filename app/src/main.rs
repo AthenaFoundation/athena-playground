@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+// #[macro_use]
+// extern crate lazy_static;
 pub(crate) mod athena_sandbox;
 mod server;
 use std::{env, net::SocketAddr, path::PathBuf};
@@ -31,8 +34,10 @@ impl Default for Config {
 }
 
 fn main() {
-    let mut config = Config::default();
-    config.ath_file_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("temp-ath-files");
+    let config = Config {
+        ath_file_path: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("temp-ath-files"),
+        ..Default::default()
+    };
 
     server::serve(config);
 }

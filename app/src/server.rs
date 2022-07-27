@@ -70,14 +70,14 @@ fn static_file_service(root: impl AsRef<std::path::Path>, max_age: HeaderValue) 
 }
 const ONE_HOUR: Duration = Duration::from_secs(60 * 60);
 const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
-//const MAX_AGE_ONE_MIN: HeaderValue = HeaderValue::from_static("public, max-age=60");
-const MAX_AGE_ONE_DAY: HeaderValue = HeaderValue::from_static("public, max-age=86400");
+
 #[tokio::main]
 pub(crate) async fn serve(cfg: Config) {
+    let max_age_one_day = HeaderValue::from_static("public, max-age=86400");
     let root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("frontend")
         .join("dist");
-    let root_files = static_file_service(root_path, MAX_AGE_ONE_DAY);
+    let root_files = static_file_service(root_path, max_age_one_day);
     let app = Router::new()
         .fallback(root_files)
         .route("/athena", post(athena_exec_handler))
