@@ -1,17 +1,16 @@
 use std::{
-    ffi::OsString,
-    io::Read,
     path::{Path, PathBuf},
-    process::Stdio,
+    process::Stdio, time::Duration,
 };
 
 use serde::{Deserialize, Serialize};
 use tempfile::{self, TempDir};
-use tokio::io::{self, AsyncReadExt};
+
 use tokio::process::Command;
-use tokio_stream::StreamExt;
+
 use uuid::Uuid;
 
+#[allow(unused_imports)]
 use crate::Config;
 
 #[derive(Deserialize, Default)]
@@ -106,17 +105,31 @@ impl Sandbox {
 
     // Primary way to execute a command. This waits for the container to complete and collects its output
     pub async fn wait_on_cmd(&mut self, mut cmd: Command) -> String {
+        // For some reason doesn't work if duration > 7 seconds...
+        let timeout = Duration::from_secs(7);
         let output = cmd.output().await.expect("Error executing command");
 
         self.container_id_from_output(output);
-        Command::new("docker")
-            .arg("wait")
-            .arg(self.container_id.as_ref().unwrap())
-            .output()
-            .await
-            .expect("Error waiting on container execution");
+        let mut cmd = Command::new("docker");
+            cmd.arg("wait")
+            .arg(self.container_id.as_ref().unwrap());
 
-        self.get_logs().await
+        
+
+        match tokio::time::timeout(timeout, cmd.output()).await {
+            Ok(outp) => {
+                if let Ok(_o) = outp {
+                    println!("IS OK {:?}", _o);
+                    self.get_logs().await
+                } else {
+                    println!("IS Not OK {:?}", outp);
+                    String::from("Unknown encountered during execution.")
+                }
+            },
+            Err(e) => {
+                format!("Execution timeout.\nElapsed: {}", e)
+            },
+        }
     }
 
     pub async fn shutdown(&self) {

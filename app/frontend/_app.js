@@ -86,13 +86,13 @@ export default function Home() {
       },
       body: JSON.stringify({ath: athCode})
     });
-    console.log(res, "<< RES")
+    //console.log(res, "<< RES")
     let rdr = res.body.getReader();
     let msg = ""
     rdr.read().then(function process({done, value}) {
       if (done) {
         let execRes = JSON.parse(msg).message
-        console.log(execRes, "<< READING COMPLETE")
+        //console.log(execRes, "<< READING COMPLETE")
         setExecResult(execRes)
       } else {
         let dcdr = new TextDecoder()
@@ -106,7 +106,7 @@ export default function Home() {
   }
 
   const runCode = () => {
-    setExecResult("Executing in progres...")
+    setExecResult("Execution in progress...")
     handleCodeRun(code)
   }
 

@@ -1,19 +1,18 @@
-use anyhow::{anyhow, Result};
-use axum::http::{header, HeaderValue, Method, Response};
-use axum::response::IntoResponse;
+
+use axum::http::{header, HeaderValue, Method};
+
 use axum::routing::{get_service, post, MethodRouter};
-use axum::{response::Html, routing::get, Json, Router};
-use serde::{Deserialize, Serialize};
-use std::io::Write;
-use std::net::SocketAddr;
-use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use axum::{Json, Router};
+
+
+use std::path::{PathBuf};
+
 use std::time::Duration;
-use tokio::time::sleep;
+
 use tower_http::cors::{self, CorsLayer};
-use tower_http::services::{ServeDir, ServeFile};
+use tower_http::services::{ServeDir};
 use tower_http::set_header::SetResponseHeader;
-use uuid::Uuid;
+
 
 use crate::athena_sandbox::Sandbox;
 use crate::{
@@ -21,15 +20,10 @@ use crate::{
     Config,
 };
 
-async fn handler() -> Html<&'static str> {
-    Html("<h1> Hello, World!</h1>")
-}
-
 async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<AthenaExecResult> {
     let ath_file = payload.set_random_name();
     let mut sb = Sandbox::new(ath_file).await;
     let sb_file_path = sb.athfile_with_ext();
-    println!("SB FILE PATH: {:?}", sb_file_path.as_os_str());
 
     sb.write_ath_module().await;
     if !sb_file_path.exists() {
@@ -42,19 +36,77 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
         });
     }
 
-    let dir = sb.dir();
-    println!("DIR: {:#?}", &dir);
-
     let mut cmd = sb.generate_run_command();
     sb.execute(&mut cmd);
-    println!("command: {:#?}", cmd);
+
 
     let output = sb.wait_on_cmd(cmd).await;
+    
     sb.shutdown().await;
+   
     let mut res = AthenaExecResult {
         err: false,
         message: String::new(),
     };
+
+ 
+    let first_line_rm = output.lines().position(|l| {l.contains("Loading")});
+    let output = if let Some(first_line_num) = first_line_rm {
+        // Safe to unwrap here because, at worst, last_line_rm == first_line_rm
+        let last_line_num = output.lines().collect::<Vec<_>>().iter()
+            .rposition(|&l| {
+                l.contains("Loading")
+            }).unwrap();
+           
+        let output = output.lines()
+            .enumerate()
+            .filter_map(|(idx, l)| {
+                if (idx >= first_line_num && idx < last_line_num) || (idx <= last_line_num && idx > first_line_num) {
+                   
+                    None
+                } else {
+                    Some(l)
+                }
+            })
+            .skip(9)
+            .collect::<String>();
+        output.as_bytes()
+            .chunks(10)
+            .map(|buf| {
+                unsafe { std::str::from_utf8_unchecked(buf) }
+            })
+            .map(|s| {
+                if s.contains("New") || s.contains("The") || s.contains("Module") {
+                    let s0 = s.find("New");
+                    let s1 = s.find("The");
+                    let s2 = s.find("Module");
+
+                    if let Some(idx) = s0 {
+                            let mut s = s.to_string();
+                            s.insert(idx, '\n');
+                            s
+                    } else if let Some(idx) = s1 {
+                        let mut s = s.to_string();
+                        s.insert(idx, '\n');
+                        s
+                    } else if let Some(idx) = s2 {
+                        let mut s = s.to_string();
+                        s.insert(idx, '\n');
+                        s
+                    } else {
+                        s.to_string()
+                    }
+                    
+                } else {
+                    s.to_string()
+                }
+        }).collect::<String>()
+
+     
+    } else {
+        output
+    };
+    
     res.message = output;
 
     Json(res)

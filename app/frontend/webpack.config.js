@@ -7,6 +7,7 @@ module.exports = {
 		path: `${__dirname}/dist`,
 		filename: '_app.js'
 	},
+
 	module: {
 		rules: [
 			{
@@ -32,5 +33,11 @@ module.exports = {
 	plugins: [
         new MonacoWebpackPlugin(),
         new HtmlWebpackPlugin({template: `${__dirname}/index.html`})
-    ]
+    ],
+	devServer: {
+		port: 9000,
+		proxy: {
+			'/athena': 'http://localhost:3000',
+		  },
+	}
 };
