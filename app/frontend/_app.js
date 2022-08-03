@@ -68,17 +68,16 @@ export default function Home() {
     monaco.languages.setMonarchTokensProvider("athena", AthenaConfig)
     monaco.editor.defineTheme('AthenaTheme', AthenaTheme);
     monacoRef.current = monaco
-    console.log("monaco: ", monaco)
+    //console.log("monaco: ", monaco)
   }
 
   const handleCodeChange = (content, ev) => {
-    console.log("code change: ", content, ev)
+    //console.log("code change: ", content, ev)
     setCode(content)
     
   }
   
   const handleCodeRun = async (athCode) => {
-    console.log(athCode, "<< ATH CODE")
     let res = await fetch('/athena', {
       method: 'POST',
       headers: {
@@ -139,7 +138,7 @@ export default function Home() {
         />
         <div className={styles.shell}>
           <div className={styles.shellHeader}>
-            <div className={styles.shellHeaderOutput}>
+            <div onClick={() => setExecResult("")} className={styles.shellHeaderOutput}>
               <h1>Output</h1>
             </div>
 

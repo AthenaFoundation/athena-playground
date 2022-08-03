@@ -15,6 +15,7 @@ use tower_http::set_header::SetResponseHeader;
 
 
 use crate::athena_sandbox::Sandbox;
+use crate::output::AthenaOutput;
 use crate::{
     athena_sandbox::{AthenaExecResult, AthenaFileInput},
     Config,
@@ -49,65 +50,10 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
         message: String::new(),
     };
 
- 
-    let first_line_rm = output.lines().position(|l| {l.contains("Loading")});
-    let output = if let Some(first_line_num) = first_line_rm {
-        // Safe to unwrap here because, at worst, last_line_rm == first_line_rm
-        let last_line_num = output.lines().collect::<Vec<_>>().iter()
-            .rposition(|&l| {
-                l.contains("Loading")
-            }).unwrap();
-           
-        let output = output.lines()
-            .enumerate()
-            .filter_map(|(idx, l)| {
-                if (idx >= first_line_num && idx < last_line_num) || (idx <= last_line_num && idx > first_line_num) {
-                   
-                    None
-                } else {
-                    Some(l)
-                }
-            })
-            .skip(9)
-            .collect::<String>();
-        output.as_bytes()
-            .chunks(10)
-            .map(|buf| {
-                unsafe { std::str::from_utf8_unchecked(buf) }
-            })
-            .map(|s| {
-                if s.contains("New") || s.contains("The") || s.contains("Module") {
-                    let s0 = s.find("New");
-                    let s1 = s.find("The");
-                    let s2 = s.find("Module");
-
-                    if let Some(idx) = s0 {
-                            let mut s = s.to_string();
-                            s.insert(idx, '\n');
-                            s
-                    } else if let Some(idx) = s1 {
-                        let mut s = s.to_string();
-                        s.insert(idx, '\n');
-                        s
-                    } else if let Some(idx) = s2 {
-                        let mut s = s.to_string();
-                        s.insert(idx, '\n');
-                        s
-                    } else {
-                        s.to_string()
-                    }
-                    
-                } else {
-                    s.to_string()
-                }
-        }).collect::<String>()
-
-     
-    } else {
-        output
-    };
+    let output = AthenaOutput::new(output);
     
-    res.message = output;
+    
+    res.message = output.inner();
 
     Json(res)
 }
