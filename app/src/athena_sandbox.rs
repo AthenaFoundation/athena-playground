@@ -1,6 +1,7 @@
 use std::{
     path::{Path, PathBuf},
-    process::Stdio, time::Duration,
+    process::Stdio,
+    time::Duration,
 };
 
 use serde::{Deserialize, Serialize};
@@ -111,10 +112,7 @@ impl Sandbox {
 
         self.container_id_from_output(output);
         let mut cmd = Command::new("docker");
-            cmd.arg("wait")
-            .arg(self.container_id.as_ref().unwrap());
-
-        
+        cmd.arg("wait").arg(self.container_id.as_ref().unwrap());
 
         match tokio::time::timeout(timeout, cmd.output()).await {
             Ok(outp) => {
@@ -125,10 +123,10 @@ impl Sandbox {
                     println!("IS Not OK {:?}", outp);
                     String::from("Unknown encountered during execution.")
                 }
-            },
+            }
             Err(e) => {
                 format!("Execution timeout.\nElapsed: {}", e)
-            },
+            }
         }
     }
 

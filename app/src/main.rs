@@ -2,8 +2,8 @@
 // #[macro_use]
 // extern crate lazy_static;
 pub(crate) mod athena_sandbox;
-mod server;
 mod output;
+mod server;
 use std::{env, net::SocketAddr, path::PathBuf};
 const DEFAULT_ADDRESS: &str = "127.0.0.1";
 const DEFAULT_PORT: u16 = 3000;

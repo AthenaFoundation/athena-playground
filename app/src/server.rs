@@ -1,18 +1,15 @@
-
 use axum::http::{header, HeaderValue, Method};
 
 use axum::routing::{get_service, post, MethodRouter};
 use axum::{Json, Router};
 
-
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 use std::time::Duration;
 
 use tower_http::cors::{self, CorsLayer};
-use tower_http::services::{ServeDir};
+use tower_http::services::ServeDir;
 use tower_http::set_header::SetResponseHeader;
-
 
 use crate::athena_sandbox::Sandbox;
 use crate::output::AthenaOutput;
@@ -40,19 +37,17 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
     let mut cmd = sb.generate_run_command();
     sb.execute(&mut cmd);
 
-
     let output = sb.wait_on_cmd(cmd).await;
-    
+
     sb.shutdown().await;
-   
+
     let mut res = AthenaExecResult {
         err: false,
         message: String::new(),
     };
 
     let output = AthenaOutput::new(output);
-    
-    
+
     res.message = output.inner();
 
     Json(res)
