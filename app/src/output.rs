@@ -2,14 +2,33 @@ pub const LINESTARTS: [&str; 5] = ["The", "Sentence", "Module", "New", "Term"];
 
 pub struct AthenaOutput {
     inner: String,
+    file_name: String,
 }
 
 impl AthenaOutput {
-    pub fn new(s: String) -> Self {
-        let mut sself = Self { inner: s };
-        sself.rm_repl_start_text();
-        sself.add_newlines();
+    pub fn new(s: String, name: String) -> Self {
+        let mut sself = Self { inner: s, file_name: name };
+        // sself.rm_repl_start_text();
+        // sself.add_newlines();
+        sself.set_start_lines_to_file_name();
         sself
+    }
+
+    pub fn set_start_lines_to_file_name(&mut self) {
+        let outp = self.inner();
+
+        let first_line_with_fname = outp.lines().enumerate()
+            .find(|(_idx, l)| l.contains(&format!("{}", self.file_name)))
+            .unwrap();
+
+        let outp = outp.lines().enumerate().filter_map(|(idx, l)| {
+            if idx > first_line_with_fname.0 {
+                Some(format!("{}\n", l))
+            } else {
+                None
+            }
+        }).collect::<String>();
+        self.inner = outp;
     }
 
     pub fn inner(&self) -> String {

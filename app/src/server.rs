@@ -20,6 +20,7 @@ use crate::{
 
 async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<AthenaExecResult> {
     let ath_file = payload.set_random_name();
+    let name = ath_file.name().to_string();
     let mut sb = Sandbox::new(ath_file).await;
     let sb_file_path = sb.athfile_with_ext();
 
@@ -46,7 +47,7 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
         message: String::new(),
     };
 
-    let output = AthenaOutput::new(output);
+    let output = AthenaOutput::new(output, name);
 
     res.message = output.inner();
 
