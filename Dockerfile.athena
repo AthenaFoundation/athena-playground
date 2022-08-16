@@ -13,11 +13,14 @@ WORKDIR /athena
 RUN wget -O athena-linux-v1.4.1.zip https://github.com/AthenaFoundation/athena/releases/download/v1.4.1/athena-linux-v1.4.1.zip && \
    unzip athena-linux-v1.4.1.zip
 RUN mv athena-linux-v1.4.1 athena-bins
+
 ENV ATHENA_HOME=/athena/athena-bins PATH=/athena/athena-bins/:${PATH}
 ENV PATH=/athena/athena-bins/util/:${PATH}
 RUN touch /athena/athena-bins/minisat_out.txt
 RUN touch /athena/athena-bins/athena-run-temp.ath
 RUN mkdir ./temp-ath-files
+RUN cp /usr/bin/SPASS /athena/athena-bins/
+RUN mv /athena/athena-bins/SPASS /athena/athena-bins/spass
 
 ENTRYPOINT ["/athena/athena-bins/athena"]
 CMD  ["temp.ath"]
