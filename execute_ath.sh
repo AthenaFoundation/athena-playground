@@ -1,0 +1,1 @@
+athena-run > /athena/temp-ath/output.txt

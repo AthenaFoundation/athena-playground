@@ -26,6 +26,7 @@ pub struct Sandbox {
     #[allow(dead_code)]
     container_id: Option<String>,
     dir: TempDir,
+    output: String,
 }
 
 impl Sandbox {
@@ -36,6 +37,10 @@ impl Sandbox {
 
     pub fn athfile_with_ext(&self) -> PathBuf {
         self.dir.path().join(self.file.name_with_ext())
+    }
+
+    pub fn logfile(&self) -> PathBuf {
+        self.dir.path().join(&self.output)
     }
 
     pub fn dir(&self) -> &Path {
@@ -49,6 +54,8 @@ impl Sandbox {
                 file: f,
                 container_id: None,
                 dir: d,
+                output: "output.txt".to_string()
+
             },
             Err(e) => {
                 println!("ERROR {:?}", e);
@@ -56,6 +63,7 @@ impl Sandbox {
                     file: f,
                     container_id: None,
                     dir: TempDir::new().unwrap(),
+                    output: "output.txt".to_string(),
                 }
             }
         }
@@ -82,6 +90,10 @@ impl Sandbox {
         mount_exec_file.push(":");
         mount_exec_file.push("/athena/temp-ath-files/");
         mount_exec_file.push(self.file.name_with_ext());
+        let mut logfile = self.logfile().into_os_string();
+        logfile.push(":");
+        logfile.push("/athena/temp-ath-files/");
+        logfile.push(&self.output);
         cmd.arg("run")
             .arg("--name")
             .arg(self.file.name())
@@ -92,6 +104,8 @@ impl Sandbox {
             .arg("512m")
             .arg("--volume")
             .arg(mount_exec_file)
+            .arg("--volume")
+            .arg(logfile)
             .arg("athena_runtime");
 
         cmd.kill_on_drop(true);
