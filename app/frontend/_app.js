@@ -120,19 +120,27 @@ export default function Home() {
 
       return (
         codeToRender.split("\n").map((str) => {
-          const add_spaces = (str) => {
-            if (str.indexOf("\t") != -1) {
-              return str.split("\t").map((str_s) => {
-                return (<span className={styles.indented}>{str_s}</span>)
-              })
-            } else {
-              return str
-            }
+          // const add_spaces = (str) => {
+          //   let new_str = str.replaceAll("  ", <span className={styles.indented}></span>)
+          //   if (str.indexOf("\t") != -1) {
+          //     return str.split("\t").map((str_s) => {
+          //       if (str_s == "") {
+          //         return (<span className={styles.indented}></span>)
+          //       } else {
+          //         return (<span className={styles.indented}>{str_s}</span>)
+          //       }
+                
+          //     })
+          //   } else {
+          //     return str
+          //   }
             
-          }
+          // }
+
+          
           
           return (
-            <p>{add_spaces(str)}</p>
+            <p>{str}</p>
           )
         })
         
@@ -148,7 +156,7 @@ export default function Home() {
         <Editor 
           theme="vs-dark"
           height="90vh"
-          width="50vw"
+          width="30vw"
           defaultValue={getCode()}
           language="athena"
           onMount={build_editor}
@@ -164,7 +172,7 @@ export default function Home() {
             <h1 className={styles.shellHeaderFill}></h1>
           </div>
 
-          <div><p>{renderExecResult(execResult)}</p></div>
+          <div className={styles.execResult}>{renderExecResult(execResult)}</div>
         </div>
         <div className={styles.lowerPanel}>
           <button className={styles.runButton} onClick={runCode}>Run</button>

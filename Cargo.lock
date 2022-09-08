@@ -37,6 +37,7 @@ dependencies = [
  "env_logger",
  "lazy_static",
  "log",
+ "regex",
  "serde",
  "tempfile",
  "tokio",
