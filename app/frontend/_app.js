@@ -110,13 +110,32 @@ export default function Home() {
   }
 
   const renderExecResult = (codeToRender) => {
-    if (execResult) {
+    if (execResult && execResult != "") {
+      // let codeToRender2 = codeToRender.split("\t").map((str) => {
+      //   return (
+      //     <span>&nbsp;&nbsp;{str}</span>
+      //   )
+      // }).join();
+      // console.log("CODE TO RENDER 2", codeToRender2);
+
       return (
         codeToRender.split("\n").map((str) => {
+          const add_spaces = (str) => {
+            if (str.indexOf("\t") != -1) {
+              return str.split("\t").map((str_s) => {
+                return (<span className={styles.indented}>{str_s}</span>)
+              })
+            } else {
+              return str
+            }
+            
+          }
+          
           return (
-            <p>{str}</p>
+            <p>{add_spaces(str)}</p>
           )
         })
+        
       )
     } else {
       return <p></p>

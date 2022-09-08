@@ -150,7 +150,7 @@ impl Sandbox {
 
         match outp {
             Ok(o) => {
-                let o = String::from_utf8_lossy(&o.stdout);
+                let o = String::from_utf8(o.stdout).expect("Invalid output formatting");
                 o.to_string()
             }
             Err(e) => {

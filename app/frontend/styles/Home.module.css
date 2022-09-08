@@ -97,6 +97,11 @@
   height: 50px;
 }
 
+.indented {
+  display: inline-block;
+  min-width: 32px;
+  min-height: 1px;
+}
 .runButton:hover {
   cursor: pointer;
 }
@@ -111,6 +116,7 @@
   background-color: #1e1e1e;
   color: white;
   border-left: 2px solid #464545 ;
+  font-family: "Droid Sans Mono", "monospace", monospace;
  
 }
 
@@ -120,8 +126,12 @@
   width: 100%;
   flex-direction: row;
   align-items: flex-end;
+  font-family: "Droid Sans Mono", "monospace", monospace;
 
+}
 
+.shellHeader h1 {
+  font-family: "Droid Sans Mono", "monospace", monospace;
 }
 .shellHeaderFill {
   background-color: white;

@@ -14,7 +14,38 @@ impl AthenaOutput {
         // sself.rm_repl_start_text();
         // sself.add_newlines();
         sself.set_start_lines_to_file_name();
+        sself.add_indents();
+        eprintln!("{:?}", sself.inner);
         sself
+    }
+
+    pub fn add_indents(&mut self) {
+        let mut stack = vec![];
+        let outp = self.inner();
+        let mut new_outp = vec![];
+        outp.chars().for_each(|c| {
+            if c == '(' {
+                if stack.is_empty() {
+                    new_outp.push("\n".to_string());
+                    stack.push(c);
+                } else {
+                    stack.push(c);
+                    if stack.len() > 1 {
+                        new_outp.push("\n".to_string());
+                    }
+                    
+                    
+                    (0..stack.len()).into_iter().for_each(|_| {
+                        new_outp.push("\t".to_string());
+                    });
+                }
+            } else if c == ')' {
+                stack.pop();
+            }
+            new_outp.push(c.to_string());
+        });
+        self.inner = new_outp.into_iter().collect::<String>();
+       
     }
 
     pub fn set_start_lines_to_file_name(&mut self) {
