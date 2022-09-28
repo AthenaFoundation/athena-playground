@@ -10,6 +10,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
 }
 
 .footer {
@@ -65,14 +66,114 @@
     Bitstream Vera Sans Mono, Courier New, monospace;
 }
 
+.tree {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  align-items: flex-start;
+  min-width: 200px;
+  max-width: 5vw;
+  height: 80vh;
+  
+}
+
+.icons {
+  padding-left: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  
+}
+
+.folderControlIcon {
+  color: white;
+  background-color: transparent;
+  vertical-align:middle;
+}
+
+.folderControlIcon:hover {
+  cursor: pointer;
+  color: #346327;
+}
+.icon {
+  color: white;
+  background-color: transparent;
+  margin-right: 10px;
+
+}
+.icon:hover {
+  cursor: pointer;
+  color: #eaeaea;
+  
+}
+.treeHeader {
+
+  display: block;
+  margin-bottom: 20px;
+  background-color: #346327;
+  width: 100%;
+  text-align: center;
+  margin-top: -10px;
+  padding-bottom: 10px;
+}
+
+.treeHeader h2 {
+  color: white;
+  margin-bottom: 30px;
+
+}
+
+.dirHeader {
+  margin-left: 5px;
+  color: white;
+}
+
+.rootFileButton {
+  margin-left: 0;
+  display: block;
+  border: none;
+  background-color: transparent;
+  color: white;
+  margin-bottom: 5px;
+  padding: 5px;
+  margin-top: 15px;
+  min-width: 10vw;
+  text-align: left;
+}
+.treeButton {
+  display: block;
+  border: none;
+  background-color: transparent;
+  color: white;
+  margin-left: 20px;
+  margin-bottom: 5px;
+  padding: 5px;
+  min-width: 10vw;
+  text-align: left;
+}
+
+.iconLabel {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  vertical-align: middle;
+}
+
+.tree button:hover {
+  cursor: pointer;
+  background-color: #eaeaea18;
+  width: 100%;
+}
+
 .grid {
   display: flex;
   align-items: center;
   justify-content: start;
   flex-wrap: wrap;
-  max-width: 100vw;
+  min-width: 45vw;
   max-height: 95vh;
-  margin-top: 10px;
+
   background-color: #1e1e1e;
   
 }
@@ -83,18 +184,63 @@
   height: 10vh;
   width: 100vw;
   background-color: #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   border-top: 1px solid #464545 ;
- 
+  
+  
+}
+
+.flexTitle {
+  color: white;
+  padding: 0;
+  margin-left: 10px;
+  
+  display: inline-block;
+}
+.panelOptions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 95%;
+  margin-bottom: 0;
+  padding: 0;
+  background-color: #34632714;
+}
+
+.panelOptionsInner {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+.checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox input {
+  border: none;
+  border-style: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+
+.checkbox input:hover {
+  cursor: pointer;
 }
 .runButton {
-  margin-left: 10px;
-  margin-top: 10px;
   background-color:#346327;
   color: white;
   border: none;
   z-index: 5;
-  width: 100px;
-  height: 50px;
+  width: 5%;
+  height: 100%;
 }
 
 .indented {
@@ -106,15 +252,19 @@
   cursor: pointer;
 }
 
-
+.checkbox {
+  display: inline-flex;
+  color: white;
+  
+}
 .shell {
-  width: 70vw;
+  max-width: 40vw;
   white-space: pre;
   padding-right: 5px;
   padding-left: 5px;
   height: 90vh;
   overflow-y: scroll;
-  overflow-x: scroll;
+  overflow-x: visible;
   background-color: #1e1e1e;
   color: white;
   border-left: 2px solid #464545 ;

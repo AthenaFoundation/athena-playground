@@ -1,13 +1,14 @@
 
 import styles from './styles/Home.module.css'
 import React, {create, useEffect, useLayoutEffect, useRef, useState} from 'react';
-import Editor, { DiffEditor, useMonaco, loader } from "@monaco-editor/react";
-
+import Editor, { useMonaco, loader,  } from "@monaco-editor/react";
+import {Tree, Directory} from "./tree";
+import dirs from "./ath-files";
 
 const AthenaConfig =   {
   
-  keywords: ["define", "declare", "match", "check", "assert", "assume", "exists",
-      "forall", "pick-witness", "pick-any", "conclude", "by-induction", "holds", "module", "open","induction"
+  keywords: ["define", "!", "force", "load", "print", "eval", "let", "domain", "declare", "match", "check", "assert", "assume", "exists",
+      "forall", "chain", "absurd", "pick-witness", "pick-any", "conclude", "by-induction", "holds", "module", "open","induction"
   ],
   typeKeywords: ["datatype", "structure"],
   operators: [
@@ -61,23 +62,64 @@ const AthenaTheme = {
 
 export default function Home() {
   const monacoRef = useRef()
-  const [code, setCode] = useState(getCode())
+  const [fileName, setFileName]   = useState("/asymmetry.ath")
+  const [dirName, setDirName]     = useState("examples")
+  const [code, setCode] = useState(file)
   const [execResult, setExecResult] = useState()
+  const [localSave, setLocalSave] = useState(false)
+  const [dirsData, setDirsData] = useState(dirs)
+  const file = dirsData[dirName][fileName]
   const build_editor = (editor,monaco) => {
-    monaco.languages.register({id: "athena"})
+    monaco.languages.register({id: "athena", filenames: ["asymmetry.ath", "atp.ath"], folder: true})
     monaco.languages.setMonarchTokensProvider("athena", AthenaConfig)
     monaco.editor.defineTheme('AthenaTheme', AthenaTheme);
-    monacoRef.current = monaco
-    //console.log("monaco: ", monaco)
+    monacoRef.current = editor
+
   }
 
+
+  useEffect(() => {
+      let saved_dirs = localStorage.getItem("athena-local-files")
+      if (saved_dirs) {
+        console.log("Saved dirs ", saved_dirs)
+        let rootDirFiles = JSON.parse(saved_dirs);
+        setDirsData( 
+          
+           {...dirsData, "/":  rootDirFiles}
+        )
+      } else {
+        console.log("No saved dir found")
+      }
+  }, [])
+
+  useEffect(() => {
+    if (localSave) {
+      console.log("Locally saving")
+      localStorage.setItem("athena-local-files", JSON.stringify(dirsData["/"]))
+    } else {
+      console.log("Not locally saving")
+    }
+  }, [localSave, dirsData])
+
+  useEffect(() => {
+    monacoRef.current?.focus()
+    setCode(file.value)
+  }, [file.fname])
+
   const handleCodeChange = (content, ev) => {
-    //console.log("code change: ", content, ev)
-    setCode(content)
-    
+   setCode(content)
+   let new_dirs_data = {...dirsData};
+   new_dirs_data[dirName][fileName] = {value: content, fname: fileName.substring(1)};
+   setDirsData(new_dirs_data)
+  }
+
+  const openFile = (name) => {
+    setFileName(`/${name}`)
   }
   
   const handleCodeRun = async (athCode) => {
+  
+    
     let res = await fetch('/athena', {
       method: 'POST',
       headers: {
@@ -85,13 +127,12 @@ export default function Home() {
       },
       body: JSON.stringify({ath: athCode})
     });
-    //console.log(res, "<< RES")
+
     let rdr = res.body.getReader();
     let msg = ""
     rdr.read().then(function process({done, value}) {
       if (done) {
         let execRes = JSON.parse(msg).message
-        //console.log(execRes, "<< READING COMPLETE")
         setExecResult(execRes)
       } else {
         let dcdr = new TextDecoder()
@@ -106,62 +147,72 @@ export default function Home() {
 
   const runCode = () => {
     setExecResult("Execution in progress...")
+    //openFile("atp.ath");
     handleCodeRun(code)
   }
 
   const renderExecResult = (codeToRender) => {
     if (execResult && execResult != "") {
-      // let codeToRender2 = codeToRender.split("\t").map((str) => {
-      //   return (
-      //     <span>&nbsp;&nbsp;{str}</span>
-      //   )
-      // }).join();
-      // console.log("CODE TO RENDER 2", codeToRender2);
-
       return (
         codeToRender.split("\n").map((str) => {
-          // const add_spaces = (str) => {
-          //   let new_str = str.replaceAll("  ", <span className={styles.indented}></span>)
-          //   if (str.indexOf("\t") != -1) {
-          //     return str.split("\t").map((str_s) => {
-          //       if (str_s == "") {
-          //         return (<span className={styles.indented}></span>)
-          //       } else {
-          //         return (<span className={styles.indented}>{str_s}</span>)
-          //       }
-                
-          //     })
-          //   } else {
-          //     return str
-          //   }
-            
-          // }
-
-          
-          
           return (
             <p>{str}</p>
           )
         })
-        
       )
     } else {
       return <p></p>
     }
     
   }
+
+  // To do: reject all invalid filenames
+  // To do: append .ath to filenames that do not have them
+  const addFile = (fname) => {
+    if (fname == "") {
+      return;
+    } else {
+      if (!dirsData["/"][`/${fname}`]) {
+        dirsData["/"][`/${fname}`] = {
+          fname,
+          value: `module RenameMe {
+
+          }`
+        }
+      }
+    }
+  }
+
+  const toggleLocalSave = () => {
+    setLocalSave((save) => !save)
+  }
+  const handleFileDirClick = (fname, dirname) => {
+    setDirName(dirname);
+    openFile(fname);
+  }
   return (
     <div>
+     
       <main className={styles.grid}>
+        <Directory 
+          currDir={dirName} 
+          rootDir="/" 
+          onFileChange={(fname, dirname) => handleFileDirClick(fname, dirname) } 
+          workspace={dirsData}
+          onFileAdd={addFile}
+        />
         <Editor 
           theme="vs-dark"
           height="90vh"
-          width="30vw"
-          defaultValue={getCode()}
+          width="45vw"
+          options={{minimap: {enabled: true, side: "right"}}}
           language="athena"
           onMount={build_editor}
           onChange={handleCodeChange}
-          path="/"
+          path={file.fname}
+          defaultValue={file.value}
+          
+          
         />
         <div className={styles.shell}>
           <div className={styles.shellHeader}>
@@ -176,6 +227,18 @@ export default function Home() {
         </div>
         <div className={styles.lowerPanel}>
           <button className={styles.runButton} onClick={runCode}>Run</button>
+          
+          <div className={styles.panelOptions}>
+            <h3 className={styles.flexTitle}>Options</h3>
+            <div className={styles.panelOptionsInner}>
+              <div title="Save changes to browser's local storage" className={styles.checkbox}>
+                <input name="save-local" id="save-local" type="checkbox" onChange={() => toggleLocalSave()} checked={localSave} />
+                <label htmlFor="save-local">Save changes locally</label>
+              </div>
+            </div>
+          </div>
+          
+          
         </div>
       </main>
     </div>
