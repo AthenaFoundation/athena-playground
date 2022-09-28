@@ -39,13 +39,14 @@ module AsymmetryExample {
   };
   
   let tutorialFiles = {
-    "/induction_lesson_1.ath": {
-        fname: "induction_lesson_1.ath",
+    "/step1_inductive_proof.ath": {
+        fname: "step1_inductive_proof.ath",
         value: `load "nat-minus"
+load "nat-minus"
 module Factorial {
-        
+
     define [< - * one <=] := [N.< N.- N.* N.one N.<= ]
-        
+
     declare factorial: [N] -> N [[int->nat]]
     (transform-output eval [nat->int])
     
@@ -69,12 +70,12 @@ module Factorial {
                         
                     
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
-                    (!force base_case)
+                    (!force inductive_step)
     }
 }`
     },
-    "/induction_lesson_2.ath": {
-        fname: "induction_lesson_2.ath",
+    "/step2_inductive_proof.ath": {
+        fname: "step2_inductive_proof.ath",
         value: `load "nat-minus"
 module Factorial {
 
@@ -95,7 +96,7 @@ module Factorial {
     define nothing-less-than-zero := (forall x . ~ x < zero)
     
     define f_x_less_than := (forall x . factorial (x - one) <= factorial x )
-    define lte-def := (forall x y . (x <= y <==> x < y | x = y))
+    define [lte-def] := N.Less=.<=-def
 
     by-induction f_x_less_than {
         zero => conclude base_case := (factorial (zero - one) <= factorial zero)
@@ -108,7 +109,7 @@ module Factorial {
                             ]);
                             f_zero-1_eq_or_lt_f_zero := (!right-either (factorial (zero - one) < (factorial zero))  f_zero-1_eq_f_zero)
                         }
-                        (!mp (!right-iff (!uspec* lte-def [(factorial zero) (factorial (zero - one))])) f_zero-1_eq_or_lt_f_zero)
+                        (!mp (!right-iff (!uspec* lte-def [(factorial (zero - one)) (factorial zero) ])) f_zero-1_eq_or_lt_f_zero)
                         
                     
         | (m as (S n)) => conclude inductive_step := ((factorial (m - one)) <= (factorial m))
@@ -117,6 +118,7 @@ module Factorial {
                         _ := (!claim ih)
                     }
                     (!force inductive_step)
+    }
 }`
     }
   }
