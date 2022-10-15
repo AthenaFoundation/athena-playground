@@ -10,9 +10,9 @@ USER athena
 ENV USER=athena
 WORKDIR /athena
 
-RUN wget -O athena-linux-v1.4.1.zip https://github.com/AthenaFoundation/athena/releases/download/v1.4.1/athena-linux-v1.4.1.zip && \
-   unzip athena-linux-v1.4.1.zip
-RUN mv athena-linux-v1.4.1 athena-bins
+RUN wget -O athena-linux-v1.4.2.zip https://github.com/AthenaFoundation/athena/releases/download/v1.4.2/athena-linux-v1.4.2.zip && \
+   unzip athena-linux-v1.4.2.zip
+RUN mv athena-linux-v1.4.2 athena-bins
 
 ENV ATHENA_HOME=/athena/athena-bins PATH=/athena/athena-bins/:${PATH}
 ENV PATH=/athena/athena-bins/util/:${PATH}
@@ -21,6 +21,9 @@ RUN touch /athena/athena-bins/athena-run-temp.ath
 RUN mkdir ./temp-ath-files
 RUN cp /usr/bin/SPASS /athena/athena-bins/
 RUN mv /athena/athena-bins/SPASS /athena/athena-bins/spass
+
+RUN wget -O /athena/athena-bins/vampire https://vprover.github.io/bin/vampire4.2.2 && \
+chmod +x /athena/athena-bins/vampire
 
 ENTRYPOINT ["/athena/athena-bins/athena"]
 CMD  ["temp.ath"]
