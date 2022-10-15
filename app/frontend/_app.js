@@ -204,7 +204,8 @@ export default function Home() {
         <Editor 
           theme="vs-dark"
           height="90vh"
-          width="45vw"
+          width="40vw"
+        
           options={{minimap: {enabled: true, side: "right"}}}
           language="athena"
           onMount={build_editor}
@@ -223,7 +224,9 @@ export default function Home() {
             <h1 className={styles.shellHeaderFill}></h1>
           </div>
 
-          <div className={styles.execResult}>{renderExecResult(execResult)}</div>
+          <div className={styles.shellContent}>
+            <div className={styles.execResult}>{renderExecResult(execResult)}</div>
+          </div>
         </div>
         <div className={styles.lowerPanel}>
           <button className={styles.runButton} onClick={runCode}>Run</button>

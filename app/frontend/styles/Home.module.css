@@ -170,9 +170,9 @@
   display: flex;
   align-items: center;
   justify-content: start;
-  flex-wrap: wrap;
-  min-width: 45vw;
-  max-height: 95vh;
+  flex-wrap:nowrap;
+
+  max-height: 90vh;
 
   background-color: #1e1e1e;
   
@@ -204,6 +204,7 @@
   flex-direction: column;
   align-items: flex-start;
   width: 95%;
+  height: 100%;
   margin-bottom: 0;
   padding: 0;
   background-color: #34632714;
@@ -258,18 +259,28 @@
   
 }
 .shell {
-  max-width: 40vw;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-self: start;
+  flex-grow: 1;
+  flex-wrap:nowrap;
   white-space: pre;
   padding-right: 5px;
   padding-left: 5px;
   height: 90vh;
-  overflow-y: scroll;
-  overflow-x: visible;
   background-color: #1e1e1e;
   color: white;
   border-left: 2px solid #464545 ;
   font-family: "Droid Sans Mono", "monospace", monospace;
- 
+}
+
+.shellContent {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-width: 90%;
+  
 }
 
 .shellHeader {
@@ -346,5 +357,5 @@
 }
 
 .execResult {
-  overflow-x: scroll;
+  overflow-wrap: normal;
 }
