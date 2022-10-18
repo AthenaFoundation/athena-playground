@@ -79,7 +79,11 @@ export default function Home() {
   }
   useEffect(() => {
     // 👇️ scroll to bottom every time messages change
-    bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+    if (execResult != "" && execResult != "Execution in progress...") {
+
+      bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+    }
+    
   }, [execResult]);
 
   useEffect(() => {
