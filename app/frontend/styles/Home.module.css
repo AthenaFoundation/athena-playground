@@ -201,19 +201,21 @@
 }
 .panelOptions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
   width: 95%;
   height: 100%;
   margin-bottom: 0;
-  padding: 0;
+
   background-color: #34632714;
+  
 }
 
 .panelOptionsInner {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-end;
+  
 }
 .checkbox {
   display: flex;
