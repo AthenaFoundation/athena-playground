@@ -271,7 +271,7 @@
   height: 90vh;
   background-color: #1e1e1e;
   color: white;
-  border-left: 2px solid #464545 ;
+  border-left: 2px solid #464545;
   font-family: "Droid Sans Mono", "monospace", monospace;
 }
 
@@ -279,7 +279,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  max-width: 90%;
+  max-width: 900px;
   
 }
 
@@ -357,5 +357,8 @@
 }
 
 .execResult {
-  overflow-wrap: normal;
+  overflow-y: scroll;
+  height: 600px;
+  min-width: 300px;
+  margin-left: 10px;
 }

@@ -69,6 +69,7 @@ export default function Home() {
   const [localSave, setLocalSave] = useState(false)
   const [dirsData, setDirsData] = useState(dirs)
   const file = dirsData[dirName][fileName]
+  const bottomRef = useRef(null)
   const build_editor = (editor,monaco) => {
     monaco.languages.register({id: "athena", filenames: ["asymmetry.ath", "atp.ath"], folder: true})
     monaco.languages.setMonarchTokensProvider("athena", AthenaConfig)
@@ -76,7 +77,10 @@ export default function Home() {
     monacoRef.current = editor
 
   }
-
+  useEffect(() => {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+  }, [execResult]);
 
   useEffect(() => {
       let saved_dirs = localStorage.getItem("athena-local-files")
@@ -225,7 +229,10 @@ export default function Home() {
           </div>
 
           <div className={styles.shellContent}>
-            <div className={styles.execResult}>{renderExecResult(execResult)}</div>
+            <div className={styles.execResult}>
+              {renderExecResult(execResult)}
+              <div ref={bottomRef} />
+            </div>
           </div>
         </div>
         <div className={styles.lowerPanel}>
