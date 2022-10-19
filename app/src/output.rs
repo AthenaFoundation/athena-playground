@@ -61,7 +61,7 @@ impl AthenaOutput {
             .lines()
             .enumerate()
             .find(|(_idx, l)| l.contains(&format!("{}", self.file_name)))
-            .unwrap();
+            .unwrap_or_default();
 
         let outp = outp
             .lines()
@@ -74,6 +74,7 @@ impl AthenaOutput {
                 }
             })
             .collect::<String>();
+        let outp = outp[..outp.len() - 14].to_string();
         self.inner = outp;
     }
 

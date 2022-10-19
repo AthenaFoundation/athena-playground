@@ -86,6 +86,12 @@ export default function Home() {
     
   }, [execResult]);
 
+  const savePreferences = (localSave) => {
+    localStorage.setItem("athena-preferences", JSON.stringify({localSave: localSave}));
+  }
+  const saveLocal = (dirs) => {
+    localStorage.setItem("athena-local-files", JSON.stringify(dirs["/"]))
+  }
   useEffect(() => {
       let saved_dirs = localStorage.getItem("athena-local-files")
       if (saved_dirs) {
@@ -98,15 +104,27 @@ export default function Home() {
       } else {
         console.log("No saved dir found")
       }
+
+      let preferences = localStorage.getItem("athena-preferences");
+      if (preferences) {
+        let locallySaving = JSON.parse(preferences);
+        locallySaving = locallySaving.localSave;
+        if (locallySaving) {
+          setLocalSave(locallySaving);
+        }
+      }
+
+      
   }, [])
 
   useEffect(() => {
     if (localSave) {
       console.log("Locally saving")
-      localStorage.setItem("athena-local-files", JSON.stringify(dirsData["/"]))
+      saveLocal(dirsData)
     } else {
       console.log("Not locally saving")
     }
+    savePreferences(localSave);
   }, [localSave, dirsData])
 
   useEffect(() => {
@@ -176,7 +194,7 @@ export default function Home() {
 
   // To do: reject all invalid filenames
   // To do: append .ath to filenames that do not have them
-  const addFile = (fname) => {
+  const addFile = (fname, save) => {
     if (fname == "") {
       return;
     } else {
@@ -187,6 +205,10 @@ export default function Home() {
 
           }`
         }
+      }
+
+      if (save) {
+        saveLocal(dirsData)
       }
     }
   }
@@ -207,7 +229,7 @@ export default function Home() {
           rootDir="/" 
           onFileChange={(fname, dirname) => handleFileDirClick(fname, dirname) } 
           workspace={dirsData}
-          onFileAdd={addFile}
+          onFileAdd={(fname) => addFile(fname, localSave)}
         />
         <Editor 
           theme="vs-dark"
