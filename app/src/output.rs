@@ -39,19 +39,14 @@ impl AthenaOutput {
                 });
                 stack.push(c);
                 new_outp.push(c.to_string());
-                
-                
             } else if c == ')' {
                 stack.pop();
                 new_outp.push(c.to_string());
-                
-                
             } else {
-                    new_outp.push(c.to_string());
+                new_outp.push(c.to_string());
             }
         });
         self.inner = new_outp.into_iter().collect::<String>();
-       
     }
 
     pub fn set_start_lines_to_file_name(&mut self) {

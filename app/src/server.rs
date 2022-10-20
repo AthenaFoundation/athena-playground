@@ -11,7 +11,7 @@ use tower_http::cors::{self, CorsLayer};
 use tower_http::services::ServeDir;
 use tower_http::set_header::SetResponseHeader;
 
-use crate::athena_sandbox::Sandbox;
+use crate::athena_sandbox::{AthenaDirInput, Sandbox};
 use crate::output::AthenaOutput;
 use crate::{
     athena_sandbox::{AthenaExecResult, AthenaFileInput},
@@ -54,6 +54,58 @@ async fn athena_exec_handler(Json(payload): Json<AthenaFileInput>) -> Json<Athen
     Json(res)
 }
 
+async fn athena_dir_exec_handler(Json(payload): Json<AthenaDirInput>) -> Json<AthenaExecResult> {
+    println!("Payload: {:?}", payload);
+    let ath_file = payload.ath_file_to_run();
+    let name = ath_file.name.clone();
+    let mut sb = Sandbox::new(ath_file).await;
+    sb.files = Some(payload.clone());
+    let sb_file_path = sb.athfile_with_ext();
+
+    sb.write_ath_modules().await;
+    for f in &payload.files {
+        let path_f = sb.athfile_ext(&f);
+        if !path_f.exists() {
+            return Json(AthenaExecResult {
+                err: true,
+                message: format!(
+                    "Path {} does not exist",
+                    path_f.as_os_str().to_string_lossy()
+                ),
+            });
+        } else {
+            println!("Path exists: {:?}", path_f);
+        }
+    }
+    if !sb_file_path.exists() {
+        return Json(AthenaExecResult {
+            err: true,
+            message: format!(
+                "Path {} does not exist",
+                sb_file_path.as_os_str().to_string_lossy()
+            ),
+        });
+    }
+
+    let mut cmd = sb.multifile_run_command();
+    sb.execute(&mut cmd);
+
+    let output = sb.wait_on_cmd(cmd).await;
+
+    sb.shutdown().await;
+
+    let mut res = AthenaExecResult {
+        err: false,
+        message: String::new(),
+    };
+
+    let output = AthenaOutput::new(output, name);
+
+    res.message = output.inner();
+
+    Json(res)
+}
+
 fn static_file_service(root: impl AsRef<std::path::Path>, max_age: HeaderValue) -> MethodRouter {
     let files = ServeDir::new(root).precompressed_gzip();
 
@@ -76,6 +128,7 @@ pub(crate) async fn serve(cfg: Config) {
         .fallback(root_files)
         .route("/athena", post(athena_exec_handler))
         .route("/api/athena", post(athena_exec_handler))
+        .route("/athena/multi-file", post(athena_dir_exec_handler))
         .layer({
             CorsLayer::new()
                 .allow_origin(cors::Any)

@@ -143,38 +143,90 @@ export default function Home() {
     setFileName(`/${name}`)
   }
   
-  const handleCodeRun = async (athCode) => {
+  const handleCodeRun = async (athCode, fname) => {
   
-    
-    let res = await fetch('/athena', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ath: athCode})
-    });
+    let root_files = dirsData["/"];
 
-    let rdr = res.body.getReader();
-    let msg = ""
-    rdr.read().then(function process({done, value}) {
-      if (done) {
-        let execRes = JSON.parse(msg).message
-        setExecResult(execRes)
-      } else {
-        let dcdr = new TextDecoder()
-        let val = dcdr.decode(value)
-        msg = msg.concat(val)
-        return rdr.read().then(process)
+    if (
+      Object.keys(root_files).length > 1 &&
+      !!root_files[fname]
+    
+      ) {
+      console.log("Executing dir");
+      console.log(`Sending files: ${root_files}`)
+
+      let root_files_to_include = Object.assign({}, root_files)
+      if (fname !== "/scratchpad.ath") {
+        delete root_files_to_include["/scratchpad.ath"]
       }
-     
+        let payload = {
+          file_to_run: fname.substring(1),
+          files: Object.keys(root_files_to_include).map((name) => {
+            let final_name = name.substring(1, name.length - 4)
+            return {
+              name: final_name,
+              ath: root_files_to_include[name].value
+            }
+          })
+        };
+
+        let res = await fetch('/athena/multi-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        let rdr = res.body.getReader();
+        let msg = ""
+        rdr.read().then(function process({done, value}) {
+          if (done) {
+            let execRes = JSON.parse(msg).message
+            setExecResult(execRes)
+          } else {
+            let dcdr = new TextDecoder()
+            let val = dcdr.decode(value)
+            msg = msg.concat(val)
+            return rdr.read().then(process)
+          }
+         
+          
+        })
       
-    })
+    } else {
+      let res = await fetch('/athena', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ath: athCode})
+      });
+  
+      let rdr = res.body.getReader();
+      let msg = ""
+      rdr.read().then(function process({done, value}) {
+        if (done) {
+          let execRes = JSON.parse(msg).message
+          setExecResult(execRes)
+        } else {
+          let dcdr = new TextDecoder()
+          let val = dcdr.decode(value)
+          msg = msg.concat(val)
+          return rdr.read().then(process)
+        }
+       
+        
+      })
+    }
+    
+   
   }
 
   const runCode = () => {
     setExecResult("Execution in progress...")
     //openFile("atp.ath");
-    handleCodeRun(code)
+    handleCodeRun(code, fileName)
   }
 
   const renderExecResult = (codeToRender) => {
