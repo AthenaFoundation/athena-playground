@@ -73,7 +73,7 @@ export function Directory(props) {
         if (showForm) {
             return  (
                 <form onSubmit={() => handleNewFile(newFileName)}>
-                    <input type="text" onChange={(e) => setNewFileName(e.target.value)} defaultValue="File name" title="Enter file name"/>
+                    <input type="text" onChange={(e) => setNewFileName(e.target.value)} placeholder="File name" title="Enter file name"/>
                 </form>
                 
             )
