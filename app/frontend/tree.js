@@ -87,9 +87,7 @@ export function Directory(props) {
         <div className={styles.tree}>
             <div className={styles.treeHeader}>
                 <h2>Athena Playground</h2>
-                {
-                   renderHeading(newFileForm)
-                }
+              
                 
                 
             </div>

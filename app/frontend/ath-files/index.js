@@ -137,7 +137,6 @@ module MyModule {
   
 let dirs = {
     "examples": files,
-    "tutorials": tutorialFiles,
     "/": rootFiles,
 };
 

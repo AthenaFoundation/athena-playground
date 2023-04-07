@@ -316,7 +316,7 @@ export default function Home() {
         <div className={styles.lowerPanel}>
           <button className={styles.runButton} onClick={runCode}>Run</button>
           
-          <div className={styles.panelOptions}>
+          {/* <div className={styles.panelOptions}>
             <h3 className={styles.flexTitle}>Options</h3>
             <div className={styles.panelOptionsInner}>
               <div title="Save changes to browser's local storage" className={styles.checkbox}>
@@ -324,7 +324,7 @@ export default function Home() {
                 <label htmlFor="save-local">Save changes locally</label>
               </div>
             </div>
-          </div>
+          </div> */}
           
           
         </div>
