@@ -86,7 +86,7 @@ export function Directory(props) {
     return (
         <div className={styles.tree}>
             <div className={styles.treeHeader}>
-                <h2>Athena Playground</h2>
+                <h3>Athena Playground</h3>
               
                 
                 

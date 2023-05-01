@@ -292,7 +292,10 @@ export default function Home() {
           
           className={styles.editor}
 
-          options={{minimap: {enabled: true, side: "right"}}}
+          options={{
+            minimap: {enabled: false, side: "right"},
+            scrollbar: {verticalScrollbarSize: 0, horizontalScrollbarSize: 5, verticalHasArrows: false}
+          }}
           language="athena"
           onMount={build_editor}
           onChange={handleCodeChange}
@@ -304,7 +307,7 @@ export default function Home() {
         <div className={styles.shell}>
           <div className={styles.shellHeader}>
             <div onClick={() => setExecResult("")} className={styles.shellHeaderOutput}>
-              <h1>Output</h1>
+              <h3>Output</h3>
             </div>
 
             <h1 className={styles.shellHeaderFill}></h1>
