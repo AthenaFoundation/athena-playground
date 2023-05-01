@@ -265,6 +265,9 @@ export default function Home() {
     }
   }
 
+  const clearConsole = () => {
+    setExecResult("");
+  }
   const toggleLocalSave = () => {
     setLocalSave((save) => !save)
   }
@@ -286,8 +289,9 @@ export default function Home() {
         <Editor 
           theme="vs-dark"
           height="90vh"
-          width="40vw"
-        
+          
+          className={styles.editor}
+
           options={{minimap: {enabled: true, side: "right"}}}
           language="athena"
           onMount={build_editor}
@@ -315,6 +319,7 @@ export default function Home() {
         </div>
         <div className={styles.lowerPanel}>
           <button className={styles.runButton} onClick={runCode}>Run</button>
+          <button className={styles.stopButton} onClick={clearConsole}>Clear console</button>
           
           {/* <div className={styles.panelOptions}>
             <h3 className={styles.flexTitle}>Options</h3>

@@ -173,6 +173,8 @@
   flex-wrap:nowrap;
 
   max-height: 90vh;
+  width: 100vw;
+
 
   background-color: #1e1e1e;
   
@@ -243,7 +245,19 @@
   border: none;
   z-index: 5;
   width: 5%;
+  min-width: 100px;
   height: 100%;
+}
+.stopButton {
+  background-color:#632727;
+  color: white;
+  border: none;
+  z-index: 5;
+  width: 5%;
+  min-width: 100px;
+  height: 100%;
+  cursor: pointer;
+  margin-left: auto;
 }
 
 .indented {
@@ -267,10 +281,12 @@
   align-self: start;
   flex-grow: 1;
   flex-wrap:nowrap;
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
   padding-right: 5px;
   padding-left: 5px;
   height: 90vh;
+  width: 100%;
   background-color: #1e1e1e;
   color: white;
   border-left: 2px solid #464545;
@@ -280,9 +296,7 @@
 .shellContent {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
-  max-width: 900px;
-  
+  flex-wrap: nowrap;
 }
 
 .shellHeader {
@@ -351,16 +365,66 @@
   margin-left: 0.5rem;
 }
 
+.editor {
+
+  max-width: 50vw;
+  
+  
+  
+}
+@media (max-width: 960px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: scroll;
+  }
+  .tree {
+    display: none;
+  }
+
+  .shell {
+    width: 90vw;
+
+  }
+  .editor {
+    min-width: 90vw;
+    height: 50vh;
+  }
+
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;
     flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    
+    
+  }
+  .tree {
+    display: none;
+  }
+  .editor {
+    display: flex;
+    width: 90vw;
+    height: 50vh;
+    
+    
+  }
+  .shell {
+    width: 90vw;
   }
 }
 
 .execResult {
   overflow-y: scroll;
-  height: 600px;
-  min-width: 300px;
+  max-height: 90vh;
   margin-left: 10px;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
