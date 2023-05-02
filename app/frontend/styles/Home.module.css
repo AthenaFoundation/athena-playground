@@ -152,6 +152,56 @@
   text-align: left;
 }
 
+.activeWrapper {
+  width: 100%;
+  background-color: #2e2e2e;
+  display: inline-block;
+  min-width: 10vw;
+}
+
+
+.inactiveWrapper {
+  width: 100%;
+  background-color: transparent;
+  display: inline-block;
+  min-width: 10vw;
+}
+
+.inactiveWrapper button:hover, .activeWrapper button:hover {
+  cursor: pointer;
+}
+
+.inactiveWrapper:hover {
+  background-color: #2e2e2e;
+  cursor: pointer
+}
+
+.treeButtonActive {
+  display: block;
+  border: none;
+  background-color: #2e2e2e;
+  color: white;
+  margin-left: 20px;
+  margin-bottom: 5px;
+  padding: 5px;
+  min-width: 10vw;
+  width: 100%;
+  text-align: left;
+}
+
+.rootFileButtonActive {
+  margin-left: 0;
+  display: block;
+  border: none;
+  background-color: #2e2e2e;
+  color: white;
+  margin-bottom: 5px;
+  padding: 5px;
+  margin-top: 15px;
+  min-width: 10vw;
+  text-align: left;
+}
+
 .iconLabel {
   color: white;
   display: flex;
@@ -160,11 +210,7 @@
   vertical-align: middle;
 }
 
-.tree button:hover {
-  cursor: pointer;
-  background-color: #eaeaea18;
-  width: 100%;
-}
+
 
 .grid {
   display: flex;
@@ -190,10 +236,15 @@
   flex-direction: row;
   align-items: flex-start;
   border-top: 1px solid #464545 ;
-  
+  padding: 5px;
+  min-height: 20px;
   
 }
 
+.lighter {
+  background-color: #a74141;
+  margin-left: auto;
+}
 .flexTitle {
   color: white;
   padding: 0;
@@ -206,8 +257,8 @@
   flex-direction: row;
   align-items: center;
   width: 95%;
-  height: 100%;
   margin-bottom: 0;
+  
 
   background-color: #34632714;
   
@@ -247,6 +298,7 @@
   width: 5%;
   min-width: 100px;
   height: 100%;
+  border-radius: 20px;
 }
 .stopButton {
   background-color:#632727;
@@ -257,7 +309,8 @@
   min-width: 100px;
   height: 100%;
   cursor: pointer;
-  margin-left: auto;
+  margin-left: 5px;
+  border-radius: 20px;
 }
 
 .indented {
@@ -273,6 +326,9 @@
   display: inline-flex;
   color: white;
   
+}
+.selected {
+  background-color: #2e2e2e;
 }
 .shell {
   display: flex;
@@ -297,6 +353,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
+  height: 100%;
 }
 
 .shellHeader {
@@ -423,8 +480,15 @@
 
 .execResult {
   overflow-y: scroll;
-  max-height: 90vh;
+  max-height: 85vh;
   margin-left: 10px;
   overflow-wrap: break-word;
   white-space: pre-wrap;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
+
+.execResult::-webkit-scrollbar { /* Chrome*/
+  display: none; 
+}
+

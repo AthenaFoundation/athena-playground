@@ -8,13 +8,23 @@ export function Tree(props) {
     const [currFile, setCurrFile] = useState("");
     const [expanded, setExpanded] = useState(false);
 
-    const createListing = (files, onFileChange, currDir, currDirName, expanded) => {
+    const createListing = (files, onFileChange, currDir, currDirName, expanded, currFile) => {
         if (currDir || expanded || currDirName == "/") {
             return (Object.keys(files).map((file) => {
+                let curr = currFile.substring(1);
                 let fname = files[file].fname;
-                if (files[file] !== "") {
+                if (curr == fname) {
                     return (
-                        <button className={currDirName == "/" ? styles.rootFileButton : styles.treeButton} onClick={() => onFileChange(fname, currDirName)}>{fname}</button>
+                        <span className={styles.activeWrapper}>
+                            <button className={currDirName == "/" ? styles.rootFileButton : styles.treeButton} onClick={() => onFileChange(fname, currDirName)}>{fname}</button>
+                        </span>
+                            
+                    )
+                } else if (files[file] !== "") {
+                    return (
+                        <span className={styles.inactiveWrapper}>
+                            <button className={currDirName == "/" ? styles.rootFileButton : styles.treeButton} onClick={() => onFileChange(fname, currDirName)}>{fname}</button>
+                        </span>
                     )
                 }
                 
@@ -42,7 +52,7 @@ export function Tree(props) {
             </h3>
             }
             
-            {createListing(props.files, props.onFileChange, props.currDir, props.rootDir, expanded)}
+            {createListing(props.files, props.onFileChange, props.currDir, props.rootDir, expanded, props.currFile)}
         </div>
     )
 }
@@ -56,6 +66,7 @@ export function Directory(props) {
             return (
                 <Tree 
                     onFileChange={props.onFileChange}
+                    currFile={props.currFile}
                     rootDir={dirname}
                     files={dirs[dirname]}
                     currDir={props.currDir == dirname}
