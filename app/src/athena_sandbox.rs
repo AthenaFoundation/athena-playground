@@ -143,7 +143,7 @@ impl Sandbox {
             .arg("--workdir")
             .arg("/athena")
             .arg("--memory")
-            .arg("512m")
+            .arg("1024m")
             .arg("--volume")
             .arg(mount_exec_file)
             .arg("athena_runtime");
@@ -166,7 +166,7 @@ impl Sandbox {
             .arg("--workdir")
             .arg("/athena")
             .arg("--memory")
-            .arg("512m")
+            .arg("1024m")
             .arg("--volume")
             .arg(mount_exec_file)
             .arg("athena_runtime");
@@ -184,7 +184,7 @@ impl Sandbox {
     // Primary way to execute a command. This waits for the container to complete and collects its output
     pub async fn wait_on_cmd(&mut self, mut cmd: Command) -> String {
         // For some reason doesn't work if duration > 7 seconds...
-        let timeout = Duration::from_secs(7);
+        let timeout = Duration::from_secs(100);
         let output = cmd.output().await.expect("Error executing command");
 
         self.container_id_from_output(output);

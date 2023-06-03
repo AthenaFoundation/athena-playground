@@ -37,10 +37,10 @@ declare a: D
 # Proof in chaining style:
 
 assume P-implies-Q := (forall x . P x ==> Q x)
-assume (~ Q a)
-(!by-contradiction (~ P a) 
-    (!chain [(P a) ==> (Q a)         [P-implies-Q]
-                ==> false         [(absurd with (~ Q a))]]))
+    assume (~ Q a)
+    (!by-contradiction (~ P a) 
+        (!chain [(P a) ==> (Q a)         [P-implies-Q]
+                    ==> false         [(absurd with (~ Q a))]]))
 
 # Or in one step using ATPs: 
 (!prove ((forall x . P x ==> Q x) ==> ~ Q a ==> ~ P a) (ab))`
@@ -59,13 +59,13 @@ define [l l1 l2 l3 h t] := [?l ?l1 ?l2 ?l3 ?h ?t]
 # using recursion:
 
 assert* ++-def :=
-[(nil ++ l = l)
-    (h::t ++ l = h::(t ++ l))]
+    [(nil ++ l = l)
+        (h::t ++ l = h::(t ++ l))]
 
 # We may now wonder if the operation is associative:
 
 define ++-assoc :=
-(forall l1 l2 l3 . l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3)
+    (forall l1 l2 l3 . l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3)
 
 (falsify ++-assoc 10)
 
@@ -89,11 +89,11 @@ assert premise-3 := (forall x . P x ==> forall y . Q y ==> x R y)
 
 conclude goal := (exists x y . x R y)
     pick-witness a for premise-1    # We now have (P a)
-    pick-witness b for premise-2  # We now have (Q b)
-        (!chain-> [(P a) ==> (forall y . Q y ==> a R y) [premise-3]
-                        ==> (Q b ==> a R b)            [(uspec with b)]
-                        ==> (a R b)                    [(mp with (Q b))]
-                ==> goal                       [existence]])`
+        pick-witness b for premise-2  # We now have (Q b)
+            (!chain-> [(P a) ==> (forall y . Q y ==> a R y) [premise-3]
+                             ==> (Q b ==> a R b)            [(uspec with b)]
+                             ==> (a R b)                    [(mp with (Q b))]
+                             ==> goal                       [existence]])`
 
     },
     "/first-order-logic-3.ath": {
@@ -118,12 +118,12 @@ conclude goal := (~ exists x . forall y . y R x <==> ~ y R y)
             # Now we have a contradiction, which we can show more explicitly
         # by a case analysis:
             (!two-cases
-        assume (w R w)
-            (!chain-> [(w R w) ==> (~ w R w) [w-lemma]
-                                ==> false     [(absurd with (w R w))]])
-            assume (~ w R w)			 
-            (!chain-> [(~ w R w) ==> (w R w) [w-lemma]
-                                ==> false   [(absurd with (~ w R w))]])))
+                assume (w R w)
+                    (!chain-> [(w R w) ==> (~ w R w) [w-lemma]
+                                       ==> false     [(absurd with (w R w))]])
+                assume (~ w R w)			 
+                    (!chain-> [(~ w R w) ==> (w R w) [w-lemma]
+                                         ==> false   [(absurd with (~ w R w))]])))
         `
     },
     "/tree-reflection.ath": {
@@ -243,7 +243,72 @@ assert p3 := (F | H ==> A & I)
       assume h1 := (A & B)
       assume h2 := (~C ==> ~B)
       (!prove C [h1 h2])
-}`}
+}`},
+"/pelletier-63.ath": {
+    fname: "pelletier-63.ath",
+    value:
+`#---------------------------------------------------------------------------------
+# Pelletier problem 63 (From Pelletier's 75 Problems for Testing ATP's)
+#---------------------------------------------------------------------------------
+
+domain D
+declare ++:[D D] -> D
+declare a: D
+
+assert* axiom-1 := (x ++ (y ++ z) = (x ++ y) ++ z)
+assert* axiom-2 := (a ++ x = x)
+assert* axiom-3 := (forall x . exists y . y ++ x = a)
+
+define goal := (forall x y z . x ++ y = z ++ y ==> x = z)
+
+(!derive-from goal [axiom-1 axiom-2 axiom-3] |{'atp := 'vampire, 'max-time := 100}|)`
+},
+    "/pigeonhole-atp.ath": {
+        fname: "pigeonhole-atp.ath",
+        value:
+`
+#---------------------------------------------------------------------------------
+# PIGEONHOLE PRINCIPLE ENCODED IN PROPOSITIONAL LOGIC   
+# ---------------------------------------------------------------------------------
+
+datatype Object := (object Int)
+
+datatype Box := (box Int)
+
+declare inside: [Object Box] -> Boolean
+
+# Let's define two functions that take a number n > 1 and produce sentences claiming two things:
+# (1) Every object 1, ...n, n+1 is located in one of the n boxes (box 1, box 2, ..., box n).
+# (2) If  object x is inside box b (for x in [1,..,n,n+1] and b in [1,...n]) then no other object
+# y in also in b.
+
+define (all-somewhere n) :=
+  (and (map (lambda (x)
+              (or (map (lambda (b)
+                     (object x inside box b))
+                 (from-to 1 n))))
+            (from-to 1 (n plus 1))))
+
+define (none-together n) :=
+  (and (map (lambda (x)
+              (and (map (lambda (b)
+                      (if (object x inside box b)
+                  (and (map (lambda (y)
+                               (~ object y inside box b))
+                            (list-remove x (from-to 1 (plus 1 n)))))))
+                 (from-to 1 n))))
+            (from-to 1 (n plus 1))))
+
+
+# Then the pigeonhole principle is simply the assertion that the conjunction of
+# these two sentences is inconsistent:
+
+define (pigeonhole n) := (all-somewhere n & none-together n ==> false)
+
+# Let's derive this automatically for n = 10 using Vampire:
+
+(!derive-from (pigeonhole 10) [] |{'atp := 'vampire, 'max-time := 100}|)`
+    }
   };
   
   let tutorialFiles = {

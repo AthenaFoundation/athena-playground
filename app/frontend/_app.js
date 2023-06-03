@@ -289,10 +289,6 @@ export default function Home() {
           <button className={styles.runButton} onClick={runCode}>Run</button>
           <button className={styles.stopButton} onClick={clearConsole}>Clear Input</button>
           <button className={`${styles.stopButton} ` } style={{marginLeft: "auto"}} onClick={clearShell}>Clear Output</button>
-          
-      
-          
-          
         </div>
       </main>
     </div>

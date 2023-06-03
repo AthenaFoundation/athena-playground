@@ -1,8 +1,12 @@
 FROM ubuntu:latest
 
-RUN apt-get update \
-  && apt-get install --yes \
-    wget unzip spass cvc4
+RUN apt-get update --fix-missing && \
+apt-get install -y software-properties-common && \
+rm -rf /var/lib/apt/lists/*  && \
+add-apt-repository ppa:sri-csl/formal-methods && \
+apt-get update && \
+apt-get install --yes \
+    wget unzip spass cvc4 yices2 minisat
 
 
 RUN useradd -m athena -d /athena
