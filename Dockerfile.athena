@@ -10,13 +10,14 @@ apt-get install --yes \
 
 
 RUN useradd -m athena -d /athena
+RUN chmod +x /bin/bash
 USER athena
 ENV USER=athena
 WORKDIR /athena
 
-RUN wget -O athena-linux-v1.4.2.zip https://github.com/AthenaFoundation/athena/releases/download/v1.4.2/athena-linux-v1.4.2.zip && \
-   unzip athena-linux-v1.4.2.zip
-RUN mv athena-linux-v1.4.2 athena-bins
+RUN wget -O athena-linux-v1.4.3.zip https://github.com/AthenaFoundation/athena/releases/download/v1.4.3/athena-linux-v1.4.3.zip && \
+   unzip athena-linux-v1.4.3.zip
+RUN mv athena-linux-v1.4.3 athena-bins
 
 ENV ATHENA_HOME=/athena/athena-bins PATH=/athena/athena-bins/:${PATH}
 ENV PATH=/athena/athena-bins/util/:${PATH}
