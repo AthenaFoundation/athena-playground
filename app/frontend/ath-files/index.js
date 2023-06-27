@@ -308,6 +308,24 @@ define (pigeonhole n) := (all-somewhere n & none-together n ==> false)
 # Let's derive this automatically for n = 10 using Vampire:
 
 (!derive-from (pigeonhole 10) [] |{'atp := 'vampire, 'max-time := 100}|)`
+    },
+    "/smt-example.ath" : {
+        fname: "smt-example.ath",
+        value: `
+# Create a hash table for later use
+define ht := (HashTable.table)
+
+# Options for the smt procedure. Set the solver to cvc4
+# and the results to be stored in the hash table from above
+define options := |{ 'solver := 'cvc , 'results := ht }|
+
+# Ask if there is an integer ?x that is less than 3
+(SMT.smt-solve (?x < 3) options)
+
+# Print the results stored in the hash table
+(print ht)
+                
+`
     }
   };
   
