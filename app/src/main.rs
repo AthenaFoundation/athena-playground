@@ -35,8 +35,13 @@ impl Default for Config {
 }
 
 fn main() {
+    let port: u16 = match std::env::var("ATH_PORT") {
+        Ok(p) => p.parse().unwrap(),
+        Err(_) => DEFAULT_PORT
+    };
     let config = Config {
         ath_file_path: PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("temp-ath-files"),
+        port,
         ..Default::default()
     };
 

@@ -119,11 +119,19 @@ const CORS_CACHE_TIME_TO_LIVE: Duration = ONE_HOUR;
 
 #[tokio::main]
 pub(crate) async fn serve(cfg: Config) {
-    let max_age_one_day = HeaderValue::from_static("public, max-age=86400");
+    let max_age = match std::env::var("ATH_CACHE_TTL") {
+        Ok(v) => {
+            v
+        },
+        Err(_) => {
+            "3600".to_string()
+        }
+    };
+    let max_age = HeaderValue::from_str(format!("public, max-age={max_age}").as_str()).unwrap();
     let root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("frontend")
         .join("dist");
-    let root_files = static_file_service(root_path, max_age_one_day);
+    let root_files = static_file_service(root_path, max_age);
     let app = Router::new()
         .fallback(root_files)
         .route("/athena", post(athena_exec_handler))
