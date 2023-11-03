@@ -4,9 +4,10 @@ RUN apt-get update --fix-missing && \
 apt-get install -y software-properties-common && \
 rm -rf /var/lib/apt/lists/*  && \
 add-apt-repository ppa:sri-csl/formal-methods && \
+add-apt-repository ppa:swi-prolog/stable && \
 apt-get update && \
 apt-get install --yes \
-    wget unzip spass cvc4 yices2 minisat
+    wget unzip spass cvc4 yices2 minisat swi-prolog
 
 
 RUN useradd -m athena -d /athena
